@@ -8,6 +8,7 @@ import akka.actor.Actor
 /*
  * MyLogging trait partially implements the receive method of the user actor. It uses the abstract override modifier.
  * This trait also manages the file I/O dumping the log to a file named after the actor.
+ * NOTE: This class has to extended by the user class object.
  */
 
 

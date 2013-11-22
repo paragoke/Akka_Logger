@@ -11,7 +11,8 @@ case class messageAACK(msg:String)
 class PeerA extends Actor with Logging{
   
   val peerB = context.actorOf(Props(new PeerB with MyLogging),"PeerB")
-  var counter = 0 
+  var counter = 0
+  
   send(peerB,messageA("Hi"))
   send(peerB,messageA("Hi"))
   send(peerB,messageA("Hi"))

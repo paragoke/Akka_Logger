@@ -7,6 +7,7 @@ import akka.actor.ActorRef
 /*
  * Logging trait , extended by the user class as well as the MyLogging trait. It forms the base trait upon which the user class 
  * and the MyLogging trait are stacked.
+ * NOTE: This trait has to be mixed in with the actor class by the class with extends actor.
  */
 
 trait Logging extends Actor{
