@@ -14,7 +14,7 @@ import akka.routing.RoundRobinRouter
 case class finalsolution(result:Array[Long])
 case class range(start:Long,end:Long,size:Long)
 
-object Supervisor {
+object Example {
     def main(args: Array[String]) {
         val system = akka.actor.ActorSystem()
    /*
