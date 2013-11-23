@@ -23,10 +23,10 @@ object Supervisor {
 class Supervisor(val args:Array[String]) extends Actor with Logging{
  
   val numOfWorkers = 200
-  val end = args(0).toLong
+  val end = 1000000.toLong
   var jump = 100.toLong
   val packet = ((end.toDouble) / jump).ceil.toInt
-  var size1 = args(1).toLong
+  var size1 = 24.toLong
   var noofresult = 0 
   
   
