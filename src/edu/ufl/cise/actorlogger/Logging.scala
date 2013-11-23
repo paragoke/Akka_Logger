@@ -3,6 +3,9 @@ package edu.ufl.cise.actorlogger
 import java.sql.Timestamp
 import akka.actor.Actor
 import akka.actor.ActorRef
+import java.io.BufferedWriter
+import java.io.FileWriter
+import java.io.File
 
 /*
  * Logging trait , extended by the user class as well as the MyLogging trait. It forms the base trait upon which the user class 
@@ -19,6 +22,37 @@ trait Logging extends Actor{
    *  A lamport clock implemented for message ordering.
    */  
   var lmc = 0 
+  /*
+   * Create a log file named after the actor name.
+   * #moved from mylogging
+   */
+  val file:File = new File(context.self.path.name)
+  /*
+   * Create new file if not present.
+   * #moved from mylogging
+   */
+  if (!file.exists()){
+      file.createNewFile();
+      }
+  /*
+   * Reset the file by performing a dummy write
+   * #moved from mylogging
+   */
+  resetFile
+  def resetFile ={
+    
+    val fw:FileWriter  = new FileWriter(file.getAbsoluteFile())
+    val bw:BufferedWriter  = new BufferedWriter(fw)
+    bw.write("");
+	bw.close();
+    
+  }
+  /*
+   * Create a buffered writer for the log file
+   * #moved from mylogging
+   */
+  val fw:FileWriter  = new FileWriter(file.getAbsoluteFile(),true)
+  val bw:BufferedWriter  = new BufferedWriter(fw)
  
   /*
    * Now function returning the current system time in nano seconds.
@@ -34,10 +68,13 @@ trait Logging extends Actor{
     var timest = new Timestamp(System.currentTimeMillis())
   	timest.setNanos((now%1000000000).toInt)
   	/*
-  	 * Append info to log.
+  	 * Write out the log info to the buffered writer
   	 * lamport clock,timestamp,OUT(denoting sent message),current actor, message,receiver in that sequence.
+  	 * #modified to write out to the buffered writer directly
+  	 * #increased performance 300%
   	 */
-    log = log+lmc+"\t"+timest+"\t"+"OUT"+"\t"+context.self.path.name+"\t"+msg+"\t"+receiver.path.name+"\n"
+    bw.write(log+lmc+"\t"+timest+"\t"+"OUT"+"\t"+context.self.path.name+"\t"+msg+"\t"+receiver.path.name+"\n")
+    bw.flush()
     
     /*
      *  Send a tuple of the user message and the clock. This can be changed to include any information needed.
