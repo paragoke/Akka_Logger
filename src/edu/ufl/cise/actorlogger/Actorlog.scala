@@ -55,34 +55,36 @@ trait Logging extends Actor{
    */
   def now = System.nanoTime()
   /*
-   * The send method form a wrappera around the akka tell or ! method managing the logging and the lamport
-   * clock implementation. It encodes the clock in the message similar to a tcp/ip header.The user has to use
-   * this wrapper function instead of the ! operator.
+   * This implicit class is a wrapper around the actorref ! method .As the actorref class is protected in akka
+   * we cannot extend it so the class below forms a wrapper that logs the data and then sends the data to the 
+   * actor using the actorref tell method as recursive call in this scenario will not be possible.
    */
-  def send(receiver:ActorRef,msg:Any) ={
-
-    var timest = new Timestamp(System.currentTimeMillis())
-  	timest.setNanos((now%1000000000).toInt)
+  
+  implicit class refWrapper(A:ActorRef){
+    def !(msg:Any)={
+      var timest = new Timestamp(System.currentTimeMillis())
+  	  timest.setNanos((now%1000000000).toInt)
   	/*
   	 * Write out the log info to the buffered writer
   	 * lamport clock,timestamp,OUT(denoting sent message),current actor, message,receiver in that sequence.
   	 */
-    bw.write(log+lmc+"\t"+timest+"\t"+"OUT"+"\t"+context.self.path.name+"\t"+msg+"\t"+receiver.path.name+"\n")
+    bw.write(log+lmc+"\t"+timest+"\t"+"OUT"+"\t"+context.self.path.name+"\t"+msg+"\t"+A.path.name+"\n")
     bw.flush()
     
     /*
      *  Send a tuple of the user message and the clock. This can be changed to include any information needed.
      */  
-    receiver ! (msg,lmc)
+    A.tell((msg,lmc),context.self)
     /*
      * Increment the lamport clock.
      */
     lmc = lmc + 1
-    
+      
+    }
   }
   
+  
 }
-
 
 /*
  * MyLogging trait partially implements the receive method of the user actor. It acts as a wrapper around the user defined

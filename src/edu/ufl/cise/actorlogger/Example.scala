@@ -50,14 +50,14 @@ class Supervisor(val args:Array[String]) extends Actor with Logging{
     val start = rng(0)
     val end = rng(1)
     val size = rng(2)
-    send(Worker,range(start,end,size))                                 
+    Worker ! range(start,end,size)                                 
    }
   
   
   /*
    * send is a wrapper method around the ! method of the actor.
    */
-  send(Worker,range(1+((packet-1)*jump),end,size1))      
+  Worker ! range(1+((packet-1)*jump),end,size1)      
    
 
   def getRange(actor_no:Int,jump_size:Long,size:Long):List[Long] ={        
@@ -134,7 +134,7 @@ class Worker extends Actor with Logging{
    /*
    * send is a wrapper method around the ! method of the actor.
    */
-      send(sender,finalsolution(solution))
+      sender ! finalsolution(solution)
 
       }
     
