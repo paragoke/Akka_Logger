@@ -24,19 +24,16 @@ trait Logging extends Actor{
   var lmc = 0 
   /*
    * Create a log file named after the actor name.
-   * #moved from mylogging
    */
   val file:File = new File(context.self.path.name)
   /*
    * Create new file if not present.
-   * #moved from mylogging
    */
   if (!file.exists()){
       file.createNewFile();
       }
   /*
    * Reset the file by performing a dummy write
-   * #moved from mylogging
    */
   resetFile
   def resetFile ={
@@ -49,7 +46,6 @@ trait Logging extends Actor{
   }
   /*
    * Create a buffered writer for the log file
-   * #moved from mylogging
    */
   val fw:FileWriter  = new FileWriter(file.getAbsoluteFile(),true)
   val bw:BufferedWriter  = new BufferedWriter(fw)
@@ -70,8 +66,6 @@ trait Logging extends Actor{
   	/*
   	 * Write out the log info to the buffered writer
   	 * lamport clock,timestamp,OUT(denoting sent message),current actor, message,receiver in that sequence.
-  	 * #modified to write out to the buffered writer directly
-  	 * #increased performance 300%
   	 */
     bw.write(log+lmc+"\t"+timest+"\t"+"OUT"+"\t"+context.self.path.name+"\t"+msg+"\t"+receiver.path.name+"\n")
     bw.flush()
@@ -107,7 +101,6 @@ trait MyLogging extends Actor with Logging{
   /*
    * Partial implementation of the actor receive method. The logging info is recorded, the lamport clock is seperated from the msg and then the
    * message is forwarded to actor using the super method.
-   * #moved file io to logging
    */
   
   abstract override def receive = {

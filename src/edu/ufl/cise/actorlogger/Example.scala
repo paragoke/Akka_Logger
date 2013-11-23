@@ -1,13 +1,15 @@
+/**
+ * This is the first DOS assignment modified to demonstrate the usage of our logging capabilities.
+ * The logged files are generated on the classpath to keep them compatible.The files are named after
+ * their respective actor names. Comments have been added to where the looging capabilites are added.
+ */
+
 package edu.ufl.cise.actorlogger
 
 import scala.Array.canBuildFrom
-
 import akka.actor.Actor
 import akka.actor.Props
 import akka.routing.RoundRobinRouter
-
-
-
  
 case class finalsolution(result:Array[Long])
 case class range(start:Long,end:Long,size:Long)
@@ -15,12 +17,17 @@ case class range(start:Long,end:Long,size:Long)
 object Supervisor {
     def main(args: Array[String]) {
         val system = akka.actor.ActorSystem()
+   /*
+   * Every actor object has to be initialized using the MyLogging trait.
+   */
         val Supervisor = system.actorOf(Props(new Supervisor(args) with MyLogging),"Supervisor")
     }
 }
 
-
-class Supervisor(val args:Array[String]) extends Actor with Logging{
+/*
+ * A user class has to extend the logging trait.
+ */
+class Supervisor(val args:Array[String]) extends Actor with Logging{  
  
   val numOfWorkers = 200
   val end = 1000000.toLong
@@ -29,33 +36,38 @@ class Supervisor(val args:Array[String]) extends Actor with Logging{
   var size1 = 24.toLong
   var noofresult = 0 
   
+  /*
+   * Every actor object has to be initialized using the MyLogging trait.
+   */
   
    val Worker = context.actorOf(Props(new Worker with MyLogging).withRouter
       (RoundRobinRouter(nrOfInstances = numOfWorkers)),"worker") 
   
    val startTime = System.currentTimeMillis()
    
-   for(a<- 1 until packet){                                        //Send workers the range they need 
+   for(a<- 1 until packet){                                   
     val rng = getRange(a,jump,size1)
     val start = rng(0)
     val end = rng(1)
     val size = rng(2)
-    send(Worker,range(start,end,size))                                 // to calculate
+    send(Worker,range(start,end,size))                                 
    }
   
   
-  
-  send(Worker,range(1+((packet-1)*jump),end,size1))      // The last worker is an exception
+  /*
+   * send is a wrapper method around the ! method of the actor.
+   */
+  send(Worker,range(1+((packet-1)*jump),end,size1))      
    
 
-  def getRange(actor_no:Int,jump_size:Long,size:Long):List[Long] ={        // Calculates range for a worker
-                                                                        // Using its index in the array
+  def getRange(actor_no:Int,jump_size:Long,size:Long):List[Long] ={        
+                                                                        
     List( 1+(actor_no-1)*jump_size, actor_no*jump_size, size)   
   
   }
   
   
- def receive ={                                                        //Supervisor receive method
+ def receive ={                                                        
    
    case finalsolution(result) =>
      
@@ -76,20 +88,22 @@ class Supervisor(val args:Array[String]) extends Actor with Logging{
 }
 
 
-
+/*
+ * A user class has to extend the logging trait.
+ */
 
 
 class Worker extends Actor with Logging{
 
 
-  var diff:Long = 0                            //Intialise variables needed
+  var diff:Long = 0                            
   var sqroot:Double = 0
 
   
   
   def sumnsq(n:Long):Long = {
   
-    (n*(n+1)*(2*n+1))/6                              //Calculates the sum of first n square multiplied by six
+    (n*(n+1)*(2*n+1))/6                           
   
   }
   
@@ -105,18 +119,21 @@ class Worker extends Actor with Logging{
       var size = size1
       
 
-       while(start<=end)   {                                 //Loops through the range to find a sequence
+       while(start<=end)   {                                
         
-        diff = sumnsq(start+size-1) - sumnsq(start-1)      // It used the mathematical formula
+        diff = sumnsq(start+size-1) - sumnsq(start-1)     
         sqroot = math.sqrt(diff)                                         
-        if(sqroot.isValidInt){                                           //The square root is checked to be a valid 
-          solution = solution :+ start                                        // integer and if so is sent to the supervisor
+        if(sqroot.isValidInt){                             
+          solution = solution :+ start                     
         }
         start = start + 1
      }
       
 
 
+   /*
+   * send is a wrapper method around the ! method of the actor.
+   */
       send(sender,finalsolution(solution))
 
       }
